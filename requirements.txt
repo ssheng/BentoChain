@@ -1,0 +1,10 @@
+bentoml
+openai
+gradio
+langchain
+transformers
+torch
+torchvision
+torchaudio
+sentencepiece
+datasets
