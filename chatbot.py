@@ -1,11 +1,13 @@
 import os
-import torch
-from typing import Optional, Tuple
-
 import gradio as gr
+
+from typing import Optional, Tuple
 from langchain.chains import ConversationChain
 from langchain.llms import OpenAI
 from threading import Lock
+
+
+PLAYBACK_SAMPLE_RATE=16000
 
 
 def load_chain():
@@ -43,7 +45,7 @@ class ChatWrapper:
             if chain is None:
                 response = "Please paste your OpenAI key to use"
                 history.append((inp, response))
-                speech = self.generate_speech(response)
+                speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(response))
                 return history, history, speech
             # Set OpenAI key
             import openai

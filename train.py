@@ -15,7 +15,7 @@ if __name__ == "__main__":
     saved_processor = bentoml.transformers.save_model("speecht5_tts_processor", processor)
     print(f"Saved: {saved_processor}")
     
-    saved_model = bentoml.transformers.save_model("speecht5_tts_model", model)
+    saved_model = bentoml.transformers.save_model("speecht5_tts_model", model, signatures={"generate_speech": {"batchable": False}})
     print(f"Saved: {saved_model}")
     
     saved_vocoder = bentoml.transformers.save_model("speecht5_tts_vocoder", vocoder)

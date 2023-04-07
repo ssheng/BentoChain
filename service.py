@@ -2,17 +2,14 @@ import bentoml
 import torch
 import gradio as gr
 
+from chatbot import create_block, ChatWrapper
 from fastapi import FastAPI
-
 from datasets import load_dataset
 
 
 processor_ref = bentoml.models.get("speecht5_tts_processor:latest")
 model_ref = bentoml.models.get("speecht5_tts_model:latest")
 vocoder_ref = bentoml.models.get("speecht5_tts_vocoder:latest")
-
-
-PLAYBACK_SAMPLE_RATE=16000
 
 
 class SpeechT5Runnable(bentoml.Runnable):
@@ -28,17 +25,19 @@ class SpeechT5Runnable(bentoml.Runnable):
     def generate_speech(self, inp: str):
         inputs = self.processor(text=inp, return_tensors="pt")
         speech = self.model.generate_speech(inputs["input_ids"], self.speaker_embeddings, vocoder=self.vocoder)
-        return (PLAYBACK_SAMPLE_RATE, speech.numpy())
+        return speech.numpy()
 
 
 text2speech_runner = bentoml.Runner(SpeechT5Runnable, name="speecht5_runner", models=[processor_ref, model_ref, vocoder_ref])
 svc = bentoml.Service("talk_gpt", runners=[text2speech_runner])
 
 
-from chatbot import create_block, ChatWrapper
+@svc.api(input=bentoml.io.Text(), output=bentoml.io.NumpyNdarray())
+def generate_speech(inp: str):
+    return text2speech_runner.generate_speech.run(inp)
 
-chat = ChatWrapper(text2speech_runner.generate_speech.run)
+
+chat = ChatWrapper(generate_speech)
 app = FastAPI()
 app = gr.mount_gradio_app(app, create_block(chat), path="/chatbot")
-
 svc.mount_asgi_app(app, "/")
