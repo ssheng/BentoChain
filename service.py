@@ -13,6 +13,8 @@ vocoder_ref = bentoml.models.get("speecht5_tts_vocoder:latest")
 
 
 class SpeechT5Runnable(bentoml.Runnable):
+    SUPPORTED_RESOURCES = ("nvidia.com/gpu", "cpu")
+    SUPPORTS_CPU_MULTI_THREADING = True
 
     def __init__(self):
         self.processor = bentoml.transformers.load_model(processor_ref)
@@ -29,7 +31,7 @@ class SpeechT5Runnable(bentoml.Runnable):
 
 
 text2speech_runner = bentoml.Runner(SpeechT5Runnable, name="speecht5_runner", models=[processor_ref, model_ref, vocoder_ref])
-svc = bentoml.Service("talk_gpt", runners=[text2speech_runner])
+svc = bentoml.Service("voicegpt", runners=[text2speech_runner])
 
 
 @svc.api(input=bentoml.io.Text(), output=bentoml.io.NumpyNdarray())

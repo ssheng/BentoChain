@@ -52,7 +52,7 @@ class ChatWrapper:
             openai.api_key = api_key
             # Run chain and append input.
             output = chain.run(input=inp)
-            speech = self.generate_speech(output)
+            speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(output))
 
             history.append((inp, output))
         except Exception as e:
