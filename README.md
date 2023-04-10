@@ -42,7 +42,11 @@ bentoml build
 Containerize the application as an OCI image. This step requires Docker running.
 
 ```sh
-bentoml containerize voicegpt:imllz4gxqkjwscvj
+bentoml containerize voicegpt:ahbt5xwxqsivkcvj
 ```
 
-Run Do
+Run in Docker container.
+
+```sh
+docker run -it --rm -p 3333:3000 voicegpt:ahbt5xwxqsivkcvj serve --production
+```
