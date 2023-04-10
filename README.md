@@ -8,7 +8,7 @@ BentoChain is a 🦜️🔗 [LangChain](https://github.com/hwchase17/langchain) 
 
 🎱 Generates OpenAPI and gRPC endpoints automatically.
 
-☁️ Deploys models as microservices deploy on the most optimal hardware and scale independently.
+☁️ Deploys models as microservices running on the most optimal hardware and scaling independently.
 
 ## Instructions
 
