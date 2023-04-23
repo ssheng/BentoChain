@@ -1,19 +1,28 @@
 import os
 import gradio as gr
-
 from typing import Optional, Tuple
 from langchain.chains import ConversationChain
+from langchain.agents import load_tools, initialize_agent, AgentType
+from langchain.memory import ConversationBufferMemory
 from langchain.llms import OpenAI
 from threading import Lock
 
 
-PLAYBACK_SAMPLE_RATE=16000
+PLAYBACK_SAMPLE_RATE = 16000
 
 
 def load_chain():
     """Logic for loading the chain you want to use should go here."""
+    memory = ConversationBufferMemory(memory_key="chat_history")
     llm = OpenAI(temperature=0)
-    chain = ConversationChain(llm=llm)
+    tools = load_tools(["wikipedia"], llm=llm)
+    chain = initialize_agent(
+        tools,
+        llm,
+        agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
+        verbose=True,
+        memory=memory,
+    )
     return chain
 
 
@@ -28,33 +37,42 @@ def set_openai_api_key(api_key: str):
         os.environ["OPENAI_API_KEY"] = ""
         return chain
 
-class ChatWrapper:
 
-    def __init__(self, generate_speech):
+class ChatWrapper:
+    def __init__(self, generate_speech, generate_text):
         self.lock = Lock()
         self.generate_speech = generate_speech
+        self.generate_text = generate_text
 
     def __call__(
-        self, api_key: str, inp: str, history: Optional[Tuple[str, str]], chain: Optional[ConversationChain]
+        self,
+        api_key: str,
+        audio_path: str,
+        history: Optional[Tuple[str, str]],
+        chain: Optional[ConversationChain],
     ):
         """Execute the chat functionality."""
         self.lock.acquire()
         try:
-            history = history or []
-            # If chain is None, that is because no API key was provided.
-            if chain is None:
-                response = "Please paste your OpenAI key to use"
-                history.append((inp, response))
-                speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(response))
-                return history, history, speech
-            # Set OpenAI key
-            import openai
-            openai.api_key = api_key
-            # Run chain and append input.
-            output = chain.run(input=inp)
-            speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(output))
+            transcription = self.generate_text(audio_path)
+            if transcription is not None:
+                history = history or []
+                # If chain is None, that is because no API key was provided.
+                if chain is None:
+                    response = "Please paste your OpenAI key to use"
+                    history.append((transcription, response))
+                    speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(response))
+                    return history, history, speech
+                # Set OpenAI key
+                import openai
 
-            history.append((inp, output))
+                openai.api_key = api_key
+                # Run chain and append input.
+                output = chain.run(input=transcription)
+                speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(output))
+                history.append((transcription, output))
+            else:
+                speech = None
         except Exception as e:
             raise e
         finally:
@@ -83,21 +101,11 @@ def create_block(chat: ChatWrapper):
         audio = gr.Audio(label="Chatbot Voice", elem_id="chatbox_voice")
 
         with gr.Row():
-            message = gr.Textbox(
-                label="What's your question?",
-                placeholder="What's the answer to life, the universe, and everything?",
-                lines=1,
+            audio_message = gr.Audio(
+                label="User voice message",
+                source="microphone",
+                type="filepath",
             )
-            submit = gr.Button(value="Send", variant="secondary").style(full_width=False)
-
-        gr.Examples(
-            examples=[
-                "Hi! How's it going?",
-                "What should I do tonight?",
-                "Whats 2 + 2?",
-            ],
-            inputs=message,
-        )
 
         gr.HTML("Demo BentoML application of a LangChain chain.")
 
@@ -108,8 +116,11 @@ def create_block(chat: ChatWrapper):
         state = gr.State()
         agent_state = gr.State()
 
-        submit.click(chat, inputs=[openai_api_key_textbox, message, state, agent_state], outputs=[chatbot, state, audio])
-        message.submit(chat, inputs=[openai_api_key_textbox, message, state, agent_state], outputs=[chatbot, state, audio])
+        audio_message.change(
+            chat,
+            inputs=[openai_api_key_textbox, audio_message, state, agent_state],
+            outputs=[chatbot, state, audio],
+        )
 
         openai_api_key_textbox.change(
             set_openai_api_key,

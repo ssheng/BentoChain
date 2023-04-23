@@ -50,3 +50,6 @@ Run in Docker container.
 ```sh
 docker run -it --rm -p 3333:3000 voicegpt:ahbt5xwxqsivkcvj serve --production
 ```
+
+
+pip install ffmpeg librosa soundfile wikipedia
