@@ -8,3 +8,7 @@ torchvision
 torchaudio
 sentencepiece
 datasets
+ffmpeg 
+librosa 
+soundfile 
+wikipedia
