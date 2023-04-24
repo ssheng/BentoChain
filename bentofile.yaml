@@ -4,5 +4,7 @@ labels:
   project: gallery
 include:
   - "*.py"
+exclude:
+  - ".venv"
 python:
   requirements_txt: ./requirements.txt
