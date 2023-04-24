@@ -1,6 +1,8 @@
 import os
 import gradio as gr
 from typing import Optional, Tuple
+import bentoml
+from datasets import Dataset, Audio
 from langchain.chains import ConversationChain
 from langchain.agents import load_tools, initialize_agent, AgentType
 from langchain.memory import ConversationBufferMemory
@@ -43,6 +45,8 @@ class ChatWrapper:
         self.lock = Lock()
         self.generate_speech = generate_speech
         self.generate_text = generate_text
+        self.s2t_processor_ref = bentoml.models.get("whisper_processor:latest")
+        self.processor = bentoml.transformers.load_model(self.s2t_processor_ref)
 
     def __call__(
         self,
@@ -54,7 +58,19 @@ class ChatWrapper:
         """Execute the chat functionality."""
         self.lock.acquire()
         try:
-            transcription = self.generate_text(audio_path)
+            audio_dataset = Dataset.from_dict({"audio": [audio_path]}).cast_column(
+                "audio",
+                Audio(sampling_rate=16000),
+            )
+            sample = audio_dataset[0]["audio"]
+
+            input_features = self.processor(
+                sample["array"],
+                sampling_rate=sample["sampling_rate"],
+                return_tensors="pt",
+            ).input_features
+
+            transcription = self.generate_text(input_features)
             if transcription is not None:
                 history = history or []
                 # If chain is None, that is because no API key was provided.
