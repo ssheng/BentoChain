@@ -64,29 +64,30 @@ class ChatWrapper:
             )
             sample = audio_dataset[0]["audio"]
 
-            input_features = self.processor(
-                sample["array"],
-                sampling_rate=sample["sampling_rate"],
-                return_tensors="pt",
-            ).input_features
+            if sample is not None:
+                input_features = self.processor(
+                    sample["array"],
+                    sampling_rate=sample["sampling_rate"],
+                    return_tensors="pt",
+                ).input_features
 
-            transcription = self.generate_text(input_features)
-            if transcription is not None:
-                history = history or []
-                # If chain is None, that is because no API key was provided.
-                if chain is None:
-                    response = "Please paste your OpenAI key to use"
-                    history.append((transcription, response))
-                    speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(response))
-                    return history, history, speech
-                # Set OpenAI key
-                import openai
+                transcription = self.generate_text(input_features)
+                if transcription is not None:
+                    history = history or []
+                    # If chain is None, that is because no API key was provided.
+                    if chain is None:
+                        response = "Please paste your OpenAI key to use"
+                        history.append((transcription, response))
+                        speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(response))
+                        return history, history, speech
+                    # Set OpenAI key
+                    import openai
 
-                openai.api_key = api_key
-                # Run chain and append input.
-                output = chain.run(input=transcription)
-                speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(output))
-                history.append((transcription, output))
+                    openai.api_key = api_key
+                    # Run chain and append input.
+                    output = chain.run(input=transcription)
+                    speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(output))
+                    history.append((transcription, output))
             else:
                 speech = None
         except Exception as e:
