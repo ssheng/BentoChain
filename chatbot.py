@@ -52,44 +52,51 @@ class ChatWrapper:
         self,
         api_key: str,
         audio_path: str,
+        text_message: str,
         history: Optional[Tuple[str, str]],
         chain: Optional[ConversationChain],
     ):
         """Execute the chat functionality."""
         self.lock.acquire()
         try:
-            audio_dataset = Dataset.from_dict({"audio": [audio_path]}).cast_column(
-                "audio",
-                Audio(sampling_rate=16000),
-            )
-            sample = audio_dataset[0]["audio"]
+            if audio_path is None and text_message != "":
+                transcription = text_message
+            elif audio_path != "" and text_message == "":
+                audio_dataset = Dataset.from_dict({"audio": [audio_path]}).cast_column(
+                    "audio",
+                    Audio(sampling_rate=16000),
+                )
+                sample = audio_dataset[0]["audio"]
 
-            if sample is not None:
-                input_features = self.processor(
-                    sample["array"],
-                    sampling_rate=sample["sampling_rate"],
-                    return_tensors="pt",
-                ).input_features
+                if sample is not None:
+                    input_features = self.processor(
+                        sample["array"],
+                        sampling_rate=sample["sampling_rate"],
+                        return_tensors="pt",
+                    ).input_features
 
-                transcription = self.generate_text(input_features)
-                if transcription is not None:
-                    history = history or []
-                    # If chain is None, that is because no API key was provided.
-                    if chain is None:
-                        response = "Please paste your OpenAI key to use"
-                        history.append((transcription, response))
-                        speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(response))
-                        return history, history, speech
-                    # Set OpenAI key
-                    import openai
+                    transcription = self.generate_text(input_features)
+                else:
+                    transcription = None
+                    speech = None
 
-                    openai.api_key = api_key
-                    # Run chain and append input.
-                    output = chain.run(input=transcription)
-                    speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(output))
-                    history.append((transcription, output))
-            else:
-                speech = None
+            if transcription is not None:
+                history = history or []
+                # If chain is None, that is because no API key was provided.
+                if chain is None:
+                    response = "Please paste your OpenAI key to use"
+                    history.append((transcription, response))
+                    speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(response))
+                    return history, history, speech
+                # Set OpenAI key
+                import openai
+
+                openai.api_key = api_key
+                # Run chain and append input.
+                output = chain.run(input=transcription)
+                speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(output))
+                history.append((transcription, output))
+
         except Exception as e:
             raise e
         finally:
@@ -124,6 +131,11 @@ def create_block(chat: ChatWrapper):
                 type="filepath",
             )
 
+            text_message = gr.Text(
+                label="User text message",
+                placeholder="Give me 5 gift ideas for my mother",
+            )
+
         gr.HTML("Demo BentoML application of a LangChain chain.")
 
         gr.HTML(
@@ -135,7 +147,25 @@ def create_block(chat: ChatWrapper):
 
         audio_message.change(
             chat,
-            inputs=[openai_api_key_textbox, audio_message, state, agent_state],
+            inputs=[
+                openai_api_key_textbox,
+                audio_message,
+                text_message,
+                state,
+                agent_state,
+            ],
+            outputs=[chatbot, state, audio],
+        )
+
+        text_message.submit(
+            chat,
+            inputs=[
+                openai_api_key_textbox,
+                audio_message,
+                text_message,
+                state,
+                agent_state,
+            ],
             outputs=[chatbot, state, audio],
         )
 
