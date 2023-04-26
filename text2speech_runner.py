@@ -12,6 +12,7 @@ class Text2SpeechRunnable(bentoml.Runnable):
     SUPPORTS_CPU_MULTI_THREADING = True
 
     def __init__(self):
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.processor = bentoml.transformers.load_model(t2s_processor_ref)
         self.model = bentoml.transformers.load_model(t2s_model_ref)
         self.vocoder = bentoml.transformers.load_model(t2s_vocoder_ref)
@@ -22,6 +23,8 @@ class Text2SpeechRunnable(bentoml.Runnable):
         self.speaker_embeddings = torch.tensor(
             self.embeddings_dataset[7306]["xvector"]
         ).unsqueeze(0)
+        self.model.to(self.device)
+        self.vocoder.to(self.device)
 
     @bentoml.Runnable.method(batchable=False)
     def generate_speech(self, inp: str):
