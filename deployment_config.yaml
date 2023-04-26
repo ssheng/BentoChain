@@ -1,0 +1,6 @@
+api_server:
+  workers: 1
+  ssl:
+    enabled: true
+    certfile: ssl/cert.pem
+    keyfile: ssl/key.pem
