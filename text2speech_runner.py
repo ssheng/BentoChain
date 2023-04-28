@@ -34,4 +34,4 @@ class Text2SpeechRunnable(bentoml.Runnable):
             self.speaker_embeddings.to(self.device),
             vocoder=self.vocoder,
         )
-        return speech.numpy()
+        return speech.cpu().numpy()
