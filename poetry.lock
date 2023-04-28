@@ -148,7 +148,7 @@ lxml = ["lxml"]
 
 [[package]]
 name = "bentoml"
-version = "1.0.17"
+version = "1.0.18"
 description = "BentoML: The Unified Model Serving Framework"
 category = "dev"
 optional = false
@@ -681,7 +681,7 @@ websockets = ">=10.0"
 
 [[package]]
 name = "gradio-client"
-version = "0.1.3"
+version = "0.1.4"
 description = "Python library for easily interacting with trained machine learning models"
 category = "dev"
 optional = false
@@ -756,7 +756,7 @@ socks = ["socksio (>=1.0.0,<2.0.0)"]
 
 [[package]]
 name = "huggingface-hub"
-version = "0.14.0"
+version = "0.14.1"
 description = "Client library to download and publish models, datasets and other repos on the huggingface.co hub"
 category = "dev"
 optional = false
@@ -772,13 +772,13 @@ tqdm = ">=4.42.1"
 typing-extensions = ">=3.7.4.3"
 
 [package.extras]
+testing = ["pytest-cov", "InquirerPy (==0.3.4)", "jedi", "jinja2", "pytest", "pytest-env", "pytest-xdist", "soundfile", "pillow", "gradio"]
 all = ["InquirerPy (==0.3.4)", "jedi", "jinja2", "pytest", "pytest-cov", "pytest-env", "pytest-xdist", "soundfile", "pillow", "gradio", "black (>=23.1,<24.0)", "ruff (>=0.0.241)", "mypy (==0.982)", "types-pyyaml", "types-requests", "types-simplejson", "types-toml", "types-tqdm", "types-urllib3"]
 cli = ["InquirerPy (==0.3.4)"]
 dev = ["InquirerPy (==0.3.4)", "jedi", "jinja2", "pytest", "pytest-cov", "pytest-env", "pytest-xdist", "soundfile", "pillow", "gradio", "black (>=23.1,<24.0)", "ruff (>=0.0.241)", "mypy (==0.982)", "types-pyyaml", "types-requests", "types-simplejson", "types-toml", "types-tqdm", "types-urllib3"]
 fastai = ["toml", "fastai (>=2.4)", "fastcore (>=1.3.27)"]
 quality = ["black (>=23.1,<24.0)", "ruff (>=0.0.241)", "mypy (==0.982)"]
 tensorflow = ["tensorflow", "pydot", "graphviz"]
-testing = ["InquirerPy (==0.3.4)", "jedi", "jinja2", "pytest", "pytest-cov", "pytest-env", "pytest-xdist", "soundfile", "pillow", "gradio"]
 torch = ["torch"]
 typing = ["types-pyyaml", "types-requests", "types-simplejson", "types-toml", "types-tqdm", "types-urllib3"]
 
@@ -1257,7 +1257,7 @@ wheel = "*"
 
 [[package]]
 name = "openai"
-version = "0.27.4"
+version = "0.27.5"
 description = "Python client library for the OpenAI API"
 category = "dev"
 optional = false
@@ -1487,7 +1487,7 @@ tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "pa
 
 [[package]]
 name = "pip"
-version = "23.1.1"
+version = "23.1.2"
 description = "The PyPA recommended tool for installing Python packages."
 category = "dev"
 optional = false
@@ -1530,15 +1530,15 @@ testing = ["pytest (>=7.2.0)", "pytest-rerunfailures", "pytest-xdist", "flit-cor
 
 [[package]]
 name = "platformdirs"
-version = "3.2.0"
+version = "3.5.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 
 [package.extras]
-docs = ["furo (>=2022.12.7)", "proselint (>=0.13)", "sphinx-autodoc-typehints (>=1.22,!=1.23.4)", "sphinx (>=6.1.3)"]
-test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest-cov (>=4)", "pytest-mock (>=3.10)", "pytest (>=7.2.2)"]
+docs = ["furo (>=2023.3.27)", "proselint (>=0.13)", "sphinx-autodoc-typehints (>=1.23,!=1.23.4)", "sphinx (>=6.1.3)"]
+test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest-cov (>=4)", "pytest-mock (>=3.10)", "pytest (>=7.3.1)"]
 
 [[package]]
 name = "pooch"
@@ -1746,11 +1746,11 @@ python-versions = ">=3.8"
 
 [[package]]
 name = "requests"
-version = "2.28.2"
+version = "2.29.0"
 description = "Python HTTP for Humans."
 category = "dev"
 optional = false
-python-versions = ">=3.7, <4"
+python-versions = ">=3.7"
 
 [package.dependencies]
 certifi = ">=2017.4.17"
@@ -1779,7 +1779,7 @@ tests = ["pytest (>=4.6)", "coverage (>=6.0.0)", "pytest-cov", "pytest-localserv
 
 [[package]]
 name = "rich"
-version = "13.3.4"
+version = "13.3.5"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 category = "dev"
 optional = false
@@ -2279,7 +2279,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "uvicorn"
-version = "0.21.1"
+version = "0.22.0"
 description = "The lightning-fast ASGI server."
 category = "dev"
 optional = false
@@ -2352,7 +2352,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "yarl"
-version = "1.9.1"
+version = "1.9.2"
 description = "Yet another URL library"
 category = "dev"
 optional = false
@@ -2377,7 +2377,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "9ce71c5a30b4c0bfdefc13a329c1e9c920cc1e409c0ca92fb8313b4c1b79068b"
+content-hash = "a69281e87138ca2aa9d40d088509fc2fd2504a1615356dc09d31cdaae3fdc411"
 
 [metadata.files]
 aiofiles = []
