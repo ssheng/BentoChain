@@ -30,8 +30,8 @@ class Text2SpeechRunnable(bentoml.Runnable):
     def generate_speech(self, inp: str):
         inputs = self.processor(text=inp, return_tensors="pt")
         speech = self.model.generate_speech(
-            inputs["input_ids"],
-            self.speaker_embeddings,
+            inputs["input_ids"].to(self.device),
+            self.speaker_embeddings.to(self.device),
             vocoder=self.vocoder,
         )
         return speech.numpy()
