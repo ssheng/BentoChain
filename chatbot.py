@@ -58,10 +58,14 @@ class ChatWrapper:
     ):
         """Execute the chat functionality."""
         self.lock.acquire()
+
+        print(f"audio_path : {audio_path} ({type(audio_path)})")
+        print(f"text_message : {text_message} ({type(text_message)})")
+
         try:
-            if audio_path is None and text_message != "":
+            if audio_path is None and text_message is not None:
                 transcription = text_message
-            elif audio_path != "" and text_message == "":
+            elif audio_path is not None and text_message in [None, ""]:
                 audio_dataset = Dataset.from_dict({"audio": [audio_path]}).cast_column(
                     "audio",
                     Audio(sampling_rate=16000),
@@ -84,10 +88,10 @@ class ChatWrapper:
                 history = history or []
                 # If chain is None, that is because no API key was provided.
                 if chain is None:
-                    response = "Please paste your OpenAI key to use"
+                    response = "Please paste your Open AI key."
                     history.append((transcription, response))
                     speech = (PLAYBACK_SAMPLE_RATE, self.generate_speech(response))
-                    return history, history, speech
+                    return history, history, speech, None, None
                 # Set OpenAI key
                 import openai
 
@@ -101,7 +105,7 @@ class ChatWrapper:
             raise e
         finally:
             self.lock.release()
-        return history, history, speech
+        return history, history, speech, None, None
 
 
 def create_block(chat: ChatWrapper):
@@ -154,7 +158,8 @@ def create_block(chat: ChatWrapper):
                 state,
                 agent_state,
             ],
-            outputs=[chatbot, state, audio],
+            outputs=[chatbot, state, audio, audio_message, text_message],
+            show_progress=False,
         )
 
         text_message.submit(
@@ -166,13 +171,15 @@ def create_block(chat: ChatWrapper):
                 state,
                 agent_state,
             ],
-            outputs=[chatbot, state, audio],
+            outputs=[chatbot, state, audio, audio_message, text_message],
+            show_progress=False,
         )
 
         openai_api_key_textbox.change(
             set_openai_api_key,
             inputs=[openai_api_key_textbox],
             outputs=[agent_state],
+            show_progress=False,
         )
 
         return block
