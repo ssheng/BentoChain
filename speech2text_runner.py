@@ -18,7 +18,7 @@ class Speech2TextRunnable(bentoml.Runnable):
     @bentoml.Runnable.method(batchable=False)
     def transcribe_audio(self, tensor):
         if tensor is not None:
-            predicted_ids = self.model.generate(tensor)
+            predicted_ids = self.model.generate(tensor.to(self.device))
             transcriptions = self.processor.batch_decode(
                 predicted_ids, skip_special_tokens=True
             )
