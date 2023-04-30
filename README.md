@@ -4,6 +4,10 @@ BentoChain is a 🦜️🔗 [LangChain](https://github.com/hwchase17/langchain) 
 
 The chatbot responds to the user's input with text, which can be played back to the user using a text-to-speech model.
 
+## Demo
+
+https://user-images.githubusercontent.com/6267065/235378103-54dd7c5b-16d1-4be7-b44a-fedde094c516.mp4
+
 ## Why deploy LangChain applications with BentoML?
 
 🐳 Containerizes LangChain applications as standard OCI images.
