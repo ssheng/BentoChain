@@ -4,5 +4,17 @@ labels:
   project: gallery
 include:
   - "*.py"
+  - "deployment_config.yaml"
+  - "ssl/*"
+exclude:
+  - ".venv"
 python:
-  requirements_txt: ./requirements.txt
+  requirements_txt: "./requirements.txt"
+docker: 
+  distro: "debian"
+  cuda_version: "11.6.2"
+  system_packages:
+      - "libsndfile-dev"
+      - "ffmpeg"
+  env:
+      BENTOML_CONFIG: "src/deployment_config.yaml"
