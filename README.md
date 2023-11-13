@@ -30,14 +30,6 @@ poetry install
 poetry shell
 ```
 
-Create SSL certificate and key (this helps establish an HTTPS connexion that is needed to allow using the microphone on modern browers)
-
-```sh
-mkdir ssl
-cd ssl
-openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -nodes
-```
-
 Download and save speech recognition and text-to-speech models.
 
 ```sh
@@ -47,32 +39,63 @@ python train.py
 Start the application locally.
 
 ```sh
-bentoml serve service:svc --reload --ssl-certfile ssl/cert.pem --ssl-keyfile ssl/key.pem
+bentoml serve
 ```
 
-Visit http://0.0.0.0:3000 for an OpenAPI Swagger page and http://0.0.0.0:3000/chatbot for a Gradio UI for the chatbot.
+Visit http://0.0.0.0:3000 for an OpenAPI Swagger page and http://0.0.0.0:3000/chatbot for a Gradio UI for the chatbot. Note that the microphone input functionality may not be functional on browsers like Google Chrome because the endpoint is not HTTPS. However, the microphone input will become functional
+after deploying to BentoCloud.
 
 
 Build application into a distributable Bento artifact.
 
 ```sh
 bentoml build
+
+Building BentoML service "voicegpt:vmjw2vucbodwkcvj" from build context "/Users/ssheng/github/BentoChain".
+Packing model "speecht5_tts_processor:7pjfnkucbgjzycvj"
+Packing model "speecht5_tts_vocoder:7suthpucbgjzycvj"
+Packing model "whisper_processor:7s6wbnecbgjzycvj"
+Packing model "whisper_model:7td75iucbgjzycvj"
+Packing model "speecht5_tts_model:7pkfc3ecbgjzycvj"
+
+██████╗░███████╗███╗░░██╗████████╗░█████╗░███╗░░░███╗██╗░░░░░
+██╔══██╗██╔════╝████╗░██║╚══██╔══╝██╔══██╗████╗░████║██║░░░░░
+██████╦╝█████╗░░██╔██╗██║░░░██║░░░██║░░██║██╔████╔██║██║░░░░░
+██╔══██╗██╔══╝░░██║╚████║░░░██║░░░██║░░██║██║╚██╔╝██║██║░░░░░
+██████╦╝███████╗██║░╚███║░░░██║░░░╚█████╔╝██║░╚═╝░██║███████╗
+╚═════╝░╚══════╝╚═╝░░╚══╝░░░╚═╝░░░░╚════╝░╚═╝░░░░░╚═╝╚══════╝
+
+Successfully built Bento(tag="voicegpt:vmjw2vucbodwkcvj").
+
+Possible next steps:
+
+ * Containerize your Bento with `bentoml containerize`:
+    $ bentoml containerize voicegpt:vmjw2vucbodwkcvj
+
+ * Push to BentoCloud with `bentoml push`:
+    $ bentoml push voicegpt:vmjw2vucbodwkcvj
 ```
 
-Containerize the application as an OCI image. This step requires Docker running.
+# Production Deployment
 
-```sh
-bentoml containerize voicegpt:ahbt5xwxqsivkcvj
-```
+BentoML provides a number of [deployment options](https://docs.bentoml.com/en/latest/concepts/deploy.html).
+The easiest way to set up a production-ready endpoint of your text embedding service is via BentoCloud,
+the serverless cloud platform built for BentoML, by the BentoML team.
 
-Run in Docker container.
+Next steps:
 
-```sh
-docker run -it --rm -p 3333:3000 voicegpt:ahbt5xwxqsivkcvj serve --production
-```
+1. Sign up for a BentoCloud account [here](https://www.bentoml.com/).
+2. Get an API Token, see instructions [here](https://docs.bentoml.com/en/latest/bentocloud/getting-started/ship.html#acquiring-an-api-token).
+3. Push your Bento to BentoCloud:
+   
+   ```sh
+   bentoml push voicegpt:vmjw2vucbodwkcvj
+   ```
 
-Push to yatai
+4. Deploy via Web UI, see [Deploying on BentoCloud](https://docs.bentoml.com/en/latest/bentocloud/getting-started/ship.html#deploying-your-bento)
 
-```sh
-bentoml push voicegpt:ahbt5xwxqsivkcvj
-```
+
+And and push to BentoCloud.
+
+
+
